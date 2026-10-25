@@ -1,9 +1,7 @@
-# AI-assisted development notes
-
-> Personalize this note with what you actually did and observed before submitting.
+# AI-Assisted Development Notes
 
 ## AI tools used
-- ChatGPT (AI coding assistant), if this matches your actual workflow.
+- AI Coding Assistant (Generative AI pair programming)
 
 ## How AI was used
 - Helped plan the FastAPI, SQLite, and Streamlit architecture.
