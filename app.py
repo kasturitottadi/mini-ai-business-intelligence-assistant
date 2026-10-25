@@ -170,7 +170,8 @@ with st.sidebar:
     st.subheader("💡 Try an example")
     for example in EXAMPLE_QUESTIONS:
         if st.button(example, use_container_width=True, key=f"ex_{example}"):
-            st.session_state["question"] = example
+            st.session_state["active_question"] = example
+            st.session_state["input_text"] = example
 
     st.markdown("---")
 
@@ -221,9 +222,9 @@ with st.sidebar:
 
 col_q, col_b = st.columns([5, 1])
 with col_q:
-    question = st.text_input(
+    typed_question = st.text_input(
         "🔍 Ask a sales question",
-        key="question",
+        value=st.session_state.get("input_text", ""),
         placeholder="e.g. Which region generated the highest sales?",
         label_visibility="visible",
     )
@@ -231,6 +232,12 @@ with col_b:
     st.write("")  # spacer for alignment
     st.write("")
     analyze_clicked = st.button("🚀 Analyze", type="primary", use_container_width=True)
+
+if analyze_clicked and typed_question.strip():
+    st.session_state["active_question"] = typed_question.strip()
+    st.session_state["input_text"] = typed_question.strip()
+
+active_question = st.session_state.get("active_question")
 
 
 # ---------------------------------------------------------------------------
@@ -338,13 +345,21 @@ def _render_chart(result: dict):
         )
         st.plotly_chart(fig, use_container_width=True)
 
-
-if analyze_clicked and question and question.strip():
+if active_question:
     try:
+        col_ans_title, col_clear = st.columns([5, 1])
+        with col_ans_title:
+            st.markdown(f"### 💬 Question: *\"{active_question}\"*")
+        with col_clear:
+            if st.button("✕ Clear", use_container_width=True):
+                st.session_state["active_question"] = ""
+                st.session_state["input_text"] = ""
+                st.rerun()
+
         with st.spinner("🔄 Analyzing sales data..."):
             response = requests.post(
                 f"{API_URL}/ask",
-                json={"question": question},
+                json={"question": active_question},
                 timeout=30,
             )
 
@@ -391,7 +406,7 @@ if analyze_clicked and question and question.strip():
     except requests.ConnectionError:
         st.error(
             "❌ Cannot connect to the API. Start the backend first:\n\n"
-            "```bash\nuvicorn main:app --reload\n```"
+            "```bash\npython3 -m uvicorn main:app --reload\n```"
         )
     except requests.Timeout:
         st.error("⏰ The request timed out. Please try again.")
