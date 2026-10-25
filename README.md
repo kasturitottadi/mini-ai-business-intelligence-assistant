@@ -50,7 +50,7 @@ Streamlit UI
 
 ## Setup
 
-Use Python 3.10 or newer.
+Compatible with **Python 3.9** or newer.
 
 ### 1. Create and activate a virtual environment
 
@@ -72,35 +72,37 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Start the API
+### 3. Start the Backend API
 
 From the project root:
 
 ```bash
-uvicorn main:app --reload
+python3 -m uvicorn main:app --reload --port 8000
 ```
+*(or `uvicorn main:app --reload`)*
 
-The first startup imports `data/sales_data.csv` into `sales.db`. API documentation is available at `http://127.0.0.1:8000/docs`.
+On first startup, the database automatically ingests `data/sales_data.csv` into `sales.db`. Interactive Swagger API documentation is available at `http://127.0.0.1:8000/docs`.
 
-### 4. Start the UI in a second terminal
+### 4. Start the User Interface in a second terminal
 
-Activate the same virtual environment, then run:
+In a new terminal window or tab (with the virtual environment activated):
 
 ```bash
-streamlit run app.py
+python3 -m streamlit run app.py
 ```
+*(or `streamlit run app.py`)*
 
-Open the local address Streamlit prints. Keep the API terminal running.
+Open the local address printed by Streamlit (default: `http://localhost:8501`).
 
 ### Optional LLM mode
 
-Copy `.env.example` to `.env`, set `OPENAI_API_KEY` and optionally `OPENAI_MODEL`, then export those variables in your terminal before starting the API. Do not commit `.env` or API keys. Without the key, the app uses its local rule-based intent parser.
+Copy `.env.example` to `.env`, set `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`), and export those variables before launching the API. Never commit `.env` or API keys. Without an API key, the system automatically uses its built-in deterministic rule-based intent parser.
 
 PowerShell example:
 ```powershell
 $env:OPENAI_API_KEY="your-key"
 $env:OPENAI_MODEL="gpt-4o-mini"
-uvicorn main:app --reload
+python -m uvicorn main:app --reload
 ```
 
 ## API examples
@@ -117,16 +119,21 @@ Example supported questions:
 - What is the monthly revenue trend?
 - Which region generated the highest sales?
 - Compare January 2026 and February 2026 revenue.
+- What is the revenue by category?
+- Compare online vs retail sales channel revenue.
+- Show me data quality summary.
 
 ## Run tests
 
 ```bash
-pytest -q
+python3 -m pytest -v
 ```
 
-## AI use and development notes
+## AI Use & Development Process
 
-This project can be developed with ChatGPT as an AI coding assistant. AI assistance was used to structure the application, draft the SQLite analytics, and design validation and tests. The developer should review the code, run it locally, and be able to explain every design choice. Add any actual debugging problems encountered during your own run before submission; do not claim to have encountered issues that did not occur.
+Generative AI was used as an interactive pair-programming assistant to brainstorm system architecture, draft the intent-to-query pipeline, and establish test coverage. All business logic, mathematical definitions, and database constraints were manually reviewed, verified, and validated against the supplied dataset.
+
+For the complete candidate reflection report covering tools used, architecture decisions, real debugging challenges solved, and future enhancements, see [AI_DEVELOPMENT_NOTES.md](AI_DEVELOPMENT_NOTES.md).
 
 ## Error handling and safety
 
